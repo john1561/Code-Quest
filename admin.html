@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Code Quest — Admin Panel</title>
+  <meta name="description" content="Organizer Dashboard for Code Quest: Java Adventure - School Expo Tournament Management">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="admin.css">
+</head>
+<body>
+
+  <!-- ADMIN HEADER -->
+  <header class="admin-header">
+    <div class="header-brand">
+      <div class="brand-icon">CQ</div>
+      <div class="brand-titles">
+        <h1>Code Quest — Admin Panel</h1>
+        <div class="badge-subtitle">Organizer Dashboard</div>
+      </div>
+    </div>
+    <div class="header-actions">
+      <div id="env-badge" class="demo-indicator">
+        <span class="dot"></span>
+        <span id="env-text">Demo Mode (Local)</span>
+      </div>
+      <button id="btn-logout" class="btn btn-secondary btn-sm" style="display: none;">
+        <span>Sign Out</span>
+      </button>
+    </div>
+  </header>
+
+  <main>
+    <!-- SCREEN 1: LOGIN -->
+    <section id="admin-login" class="login-container">
+      <div class="login-card">
+        <div class="login-header">
+          <h2>Organizer Access</h2>
+          <p>Sign in with your Supabase admin account</p>
+        </div>
+
+        <div id="login-error-alert" class="alert-message alert-error"></div>
+
+        <form id="login-form">
+          <div class="form-group">
+            <label for="login-email">Email Address</label>
+            <input type="email" id="login-email" class="form-control" placeholder="admin@expo.edu" required autocomplete="email">
+          </div>
+
+          <div class="form-group">
+            <label for="login-password">Password</label>
+            <input type="password" id="login-password" class="form-control" placeholder="••••••••" required autocomplete="current-password">
+          </div>
+
+          <button type="submit" id="btn-login-submit" class="btn btn-primary" style="width: 100%; margin-top: 0.5rem;">
+            <span>Sign In to Dashboard</span>
+          </button>
+        </form>
+
+        <div id="demo-mode-instruction" class="setup-instruction-box">
+          <h4>Local Demo Mode Active</h4>
+          <p>Supabase keys are currently unset in <code>supabase.js</code>. You can log in with any organizer email/password for immediate local tournament management.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- SCREEN 2: DASHBOARD (Hidden until authenticated) -->
+    <section id="admin-dashboard" class="admin-dashboard" style="display: none;">
+      <!-- TOP STATS BAR -->
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-icon cyan">👥</div>
+          <div class="stat-info">
+            <div class="stat-label">Total Participants</div>
+            <div class="stat-value" id="stat-total-participants">0</div>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-icon purple">🏆</div>
+          <div class="stat-info">
+            <div class="stat-label">Top Score</div>
+            <div class="stat-value" id="stat-top-score">0</div>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-icon green">📊</div>
+          <div class="stat-info">
+            <div class="stat-label">Average Score</div>
+            <div class="stat-value" id="stat-avg-score">0</div>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-icon yellow">⚡</div>
+          <div class="stat-info">
+            <div class="stat-label">Tournament Status</div>
+            <div class="stat-value" id="stat-status" style="font-size: 1.35rem;">Inactive</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB NAVIGATION -->
+      <nav class="tabs-navigation" aria-label="Dashboard Tabs">
+        <button class="tab-btn active" data-tab="tab-leaderboard">
+          <span>Leaderboard</span>
+        </button>
+        <button class="tab-btn" data-tab="tab-settings">
+          <span>Competition Settings</span>
+        </button>
+        <button class="tab-btn" data-tab="tab-danger">
+          <span>Danger Zone</span>
+        </button>
+      </nav>
+
+      <!-- TAB 1: LEADERBOARD -->
+      <div id="tab-leaderboard" class="tab-content active">
+        <div class="table-toolbar">
+          <div class="search-box">
+            <span class="search-icon">🔍</span>
+            <input type="text" id="leaderboard-search" class="form-control" placeholder="Search by player nickname...">
+          </div>
+
+          <div class="table-actions">
+            <button id="btn-refresh-data" class="btn btn-secondary">
+              <span>↻ Refresh</span>
+            </button>
+            <button id="btn-export-csv" class="btn btn-primary">
+              <span>⬇ Export CSV</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="table-card">
+          <div class="table-responsive">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th data-sort="rank">Rank</th>
+                  <th data-sort="nickname">Nickname</th>
+                  <th data-sort="score">Score</th>
+                  <th data-sort="levels_completed">Levels</th>
+                  <th data-sort="stars_earned">Stars</th>
+                  <th data-sort="total_time">Time</th>
+                  <th data-sort="created_at">Date</th>
+                  <th data-sort="status">Status</th>
+                  <th style="text-align: right;">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="leaderboard-tbody">
+                <!-- Dynamically generated rows -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 2: COMPETITION SETTINGS -->
+      <div id="tab-settings" class="tab-content">
+        <div class="settings-container">
+          <div class="settings-card">
+            <h3>Tournament Rules & Configuration</h3>
+
+            <form id="settings-form">
+              <div class="toggle-switch-container">
+                <div>
+                  <strong>Active Tournament Mode</strong>
+                  <div style="font-size: 0.8rem; color: var(--text-secondary);">Enables live competitive leaderboard rules for school expo attendees.</div>
+                </div>
+                <label class="switch">
+                  <input type="checkbox" id="cfg-is-active">
+                  <span class="slider"></span>
+                </label>
+              </div>
+
+              <div class="form-group">
+                <label for="cfg-competition-name">Tournament Title</label>
+                <input type="text" id="cfg-competition-name" class="form-control" required>
+              </div>
+
+              <div class="grid-2">
+                <div class="form-group">
+                  <label for="cfg-start-time">Start Time</label>
+                  <input type="datetime-local" id="cfg-start-time" class="form-control">
+                </div>
+                <div class="form-group">
+                  <label for="cfg-end-time">End Time</label>
+                  <input type="datetime-local" id="cfg-end-time" class="form-control">
+                </div>
+              </div>
+
+              <div class="grid-2">
+                <div class="form-group">
+                  <label for="cfg-time-limit">Time Limit Per Run</label>
+                  <select id="cfg-time-limit" class="form-control">
+                    <option value="120">2 Minutes (120s)</option>
+                    <option value="180">3 Minutes (180s)</option>
+                    <option value="300">5 Minutes (300s)</option>
+                    <option value="600">10 Minutes (600s)</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label for="cfg-target-score">Target Score for Participation</label>
+                  <input type="number" id="cfg-target-score" class="form-control" min="0" step="50">
+                </div>
+              </div>
+
+              <div class="toggle-switch-container">
+                <div>
+                  <strong>Participation Certificate / Reward</strong>
+                  <div style="font-size: 0.8rem; color: var(--text-secondary);">Grants certificate if player meets or exceeds target score.</div>
+                </div>
+                <label class="switch">
+                  <input type="checkbox" id="cfg-participation-enabled">
+                  <span class="slider"></span>
+                </label>
+              </div>
+
+              <div class="form-group" style="margin-top: 1.5rem;">
+                <label>Tournament Prizes & Podium</label>
+                <div id="prizes-container">
+                  <!-- Dynamic Prize rows -->
+                </div>
+              </div>
+
+              <div style="display: flex; justify-content: flex-end; gap: 1rem; margin-top: 2rem;">
+                <button type="submit" id="btn-save-settings" class="btn btn-primary">
+                  <span>Save Settings</span>
+                </button>
+              </div>
+            </form>
+          </div>
+
+          <div class="settings-card">
+            <h3>Quick Tournament Control</h3>
+            <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 1.5rem;">
+              Direct toggle for live booth games. Start the timer during scheduled competitions.
+            </p>
+            <button id="btn-toggle-tournament" class="btn btn-success" style="width: 100%; padding: 1rem;">
+              <span>Start Competition</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 3: DANGER ZONE -->
+      <div id="tab-danger" class="tab-content">
+        <div class="danger-container">
+          <div class="danger-card">
+            <h3>Caution: Irreversible Actions</h3>
+            <p style="font-size: 0.875rem; color: var(--text-secondary); margin-bottom: 1.5rem;">
+              Actions performed here will permanently clear game logs and leaderboard records from the persistent store.
+            </p>
+
+            <div class="danger-item">
+              <div>
+                <strong>Reset Tournament Leaderboard</strong>
+                <div style="font-size: 0.8rem; color: var(--text-secondary);">Wipes all student scores and rankings. Export a CSV backup first.</div>
+              </div>
+              <button id="btn-danger-reset" class="btn btn-danger">
+                <span>Reset Leaderboard</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- MODAL: PLAYER RUN DETAILS -->
+  <div id="player-modal" class="modal-backdrop">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h3 id="modal-player-nick">Player Details</h3>
+        <button id="btn-close-modal" class="btn-close" aria-label="Close modal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="detail-stats-grid">
+          <div class="detail-stat">
+            <div class="label">Total Score</div>
+            <div class="val" id="modal-stat-score">0</div>
+          </div>
+          <div class="detail-stat">
+            <div class="label">Stars Collected</div>
+            <div class="val" id="modal-stat-stars">0</div>
+          </div>
+          <div class="detail-stat">
+            <div class="label">Total Time</div>
+            <div class="val" id="modal-stat-time">0s</div>
+          </div>
+        </div>
+
+        <h4 style="margin-bottom: 0.75rem; font-size: 0.95rem; color: var(--text-secondary);">Level-by-Level Breakdown</h4>
+        <div class="table-responsive" style="max-height: 240px; overflow-y: auto;">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Level</th>
+                <th>Stars</th>
+                <th>Time</th>
+                <th>Instructions</th>
+                <th>Hints</th>
+              </tr>
+            </thead>
+            <tbody id="modal-breakdown-tbody">
+              <!-- Dynamically populated per-level entries -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="modal-footer" id="modal-footer-actions">
+        <!-- Actions rendered by admin.js (Verify, Flag, Delete) -->
+      </div>
+    </div>
+  </div>
+
+  <!-- TOAST CONTAINER -->
+  <div id="toast-container" class="toast-container"></div>
+
+  <!-- SCRIPTS -->
+  <!-- 1. Supabase CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <!-- 2. Code Quest Database Layer -->
+  <script src="supabase.js"></script>
+  <!-- 3. Admin Panel Logic -->
+  <script src="admin.js"></script>
+</body>
+</html>

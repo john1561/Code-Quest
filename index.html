@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Code Quest: Java Adventure</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🤖</text></svg>">
+</head>
+<body>
+
+  <!-- Floating Audio Mute Control -->
+  <div class="top-controls">
+    <button id="global-mute-btn" class="btn btn-icon" title="Toggle Sound">🔊</button>
+  </div>
+
+  <!-- Screen 1: Home Screen -->
+  <section id="home-screen" class="screen active">
+    <div class="boti-avatar">
+      <div class="boti-antenna"></div>
+      <div class="boti-head">
+        <div class="boti-screen">
+          <div class="boti-eye"></div>
+          <div class="boti-eye"></div>
+        </div>
+        <div class="boti-mouth"></div>
+      </div>
+    </div>
+
+    <div>
+      <div class="hero-badge">BSIT School Expo Edition</div>
+      <h1 class="home-title">Code Quest: Java Adventure</h1>
+      <p class="home-tagline">
+        Help Boti the robot navigate puzzling grids using fundamental Java logic! 
+        Learn sequencing, methods, loops, and conditionals while competing for the top spot.
+      </p>
+    </div>
+
+    <div class="home-actions">
+      <button id="btn-play-now" class="btn btn-primary">▶ Play Game</button>
+      <button id="btn-open-leaderboard" class="btn btn-secondary">🏆 View Leaderboard</button>
+      <button id="btn-open-rewards" class="btn btn-purple">🎖️ Achievements</button>
+    </div>
+
+    <div class="expo-credits">
+      Designed for BSIT IT Days 2026 • Interactive Educational Gaming
+    </div>
+  </section>
+
+  <!-- Screen 2: Nickname Screen -->
+  <section id="nickname-screen" class="screen">
+    <div class="glass-panel card-center">
+      <div class="boti-avatar" style="transform: scale(0.85); margin-bottom: -15px;">
+        <div class="boti-antenna"></div>
+        <div class="boti-head">
+          <div class="boti-screen">
+            <div class="boti-eye"></div>
+            <div class="boti-eye"></div>
+          </div>
+          <div class="boti-mouth"></div>
+        </div>
+      </div>
+
+      <h2 class="screen-title" style="font-size: 1.8rem;">Who's Commanding Boti?</h2>
+      <p class="screen-subtitle">Enter your cadet callsign to record your achievements and scores.</p>
+
+      <div class="input-group">
+        <label for="player-nickname">Player Callsign / Nickname</label>
+        <input type="text" id="player-nickname" class="input-field" placeholder="Enter your nickname" maxlength="15" autocomplete="nickname" required aria-required="true">
+        <span class="input-hint">Maximum 15 alphanumeric characters</span>
+      </div>
+
+      <div style="display: flex; gap: 0.75rem;">
+        <button id="btn-nickname-back" class="btn btn-secondary" style="flex: 1;">Cancel</button>
+        <button id="btn-nickname-submit" class="btn btn-primary" style="flex: 2;">Start Mission →</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Screen 3: Tutorial Screen -->
+  <section id="tutorial-screen" class="screen">
+    <div class="glass-panel tutorial-card">
+      <div class="tutorial-step-indicator">
+        <div class="step-dot active" data-step="0"></div>
+        <div class="step-dot" data-step="1"></div>
+        <div class="step-dot" data-step="2"></div>
+        <div class="step-dot" data-step="3"></div>
+      </div>
+
+      <h2 id="tutorial-title" class="screen-title" style="font-size: 1.6rem;">Action Palette Instructions</h2>
+
+      <div id="tutorial-graphic" class="tutorial-graphic">
+        <!-- Injected via tutorial state -->
+      </div>
+
+      <p id="tutorial-desc" class="screen-subtitle" style="font-size: 1.05rem; min-height: 48px;">
+        Click action cards from the palette to assemble commands for Boti.
+      </p>
+
+      <div class="tutorial-buttons">
+        <button id="btn-tutorial-skip" class="btn btn-secondary">Skip Tutorial</button>
+        <button id="btn-tutorial-next" class="btn btn-primary">Next Step →</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Screen 4: Mode Selection Screen -->
+  <section id="mode-screen" class="screen">
+    <div class="screen-header">
+      <h2 class="screen-title">Select Mission Mode</h2>
+      <p class="screen-subtitle">Choose your adventure style</p>
+    </div>
+
+    <div class="mode-grid">
+      <div id="card-mode-practice" class="glass-panel mode-card">
+        <div class="mode-icon">🧪</div>
+        <div>
+          <h3 style="font-size: 1.3rem; margin-bottom: 0.4rem;">Practice Mode</h3>
+          <p style="color: var(--text-secondary); font-size: 0.9rem; line-height: 1.5;">
+            Solve puzzles at your own leisurely pace. Hints are freely available, 
+            retries are unlimited, and you can replay any unlocked level anytime.
+          </p>
+        </div>
+        <button class="btn btn-primary" style="width: 100%; margin-top: auto;">Play Practice</button>
+      </div>
+
+      <div id="card-mode-competition" class="glass-panel mode-card" style="border-color: rgba(236, 72, 153, 0.4);">
+        <div class="mode-icon" style="background: rgba(236, 72, 153, 0.15);">⚡</div>
+        <div>
+          <h3 style="font-size: 1.3rem; margin-bottom: 0.4rem; color: var(--accent-pink);">Competition Mode</h3>
+          <p style="color: var(--text-secondary); font-size: 0.9rem; line-height: 1.5;">
+            Official expo tournament attempt! Race against the countdown timer across consecutive levels. 
+            Scores submit to the public leaderboard.
+          </p>
+        </div>
+        <button class="btn btn-purple" style="width: 100%; margin-top: auto;">Enter Arena</button>
+      </div>
+    </div>
+
+    <div style="margin-top: 2rem;">
+      <button id="btn-mode-back" class="btn btn-secondary">← Back to Title</button>
+    </div>
+  </section>
+
+  <!-- Screen 5: Competition Rules Screen -->
+  <section id="competition-rules-screen" class="screen">
+    <div class="glass-panel rules-card">
+      <h2 class="screen-title" style="font-size: 1.8rem; text-align: center;">Official Arena Rules</h2>
+
+      <div class="rules-list">
+        <div class="rules-item">
+          <span>01</span>
+          <div>Complete as many levels as possible before the timer runs out.</div>
+        </div>
+        <div class="rules-item">
+          <span>02</span>
+          <div>Collecting stars and using optimal instructions awards major bonus points.</div>
+        </div>
+        <div class="rules-item">
+          <span>03</span>
+          <div>Speed bonus awarded based on remaining time on each clear!</div>
+        </div>
+        <div class="rules-item">
+          <span>04</span>
+          <div>Your total tournament score will be permanently posted on the Expo Leaderboard.</div>
+        </div>
+      </div>
+
+      <div class="timer-select-group">
+        <label style="font-size: 0.85rem; font-weight: 600; color: var(--text-secondary); text-transform: uppercase;">
+          Select Challenge Duration:
+        </label>
+        <div class="timer-options">
+          <button class="timer-btn" data-time="120">2 Minutes</button>
+          <button class="timer-btn active" data-time="180">3 Minutes</button>
+          <button class="timer-btn" data-time="300">5 Minutes</button>
+        </div>
+      </div>
+
+      <div style="display: flex; gap: 0.75rem; margin-top: 0.5rem;">
+        <button id="btn-rules-back" class="btn btn-secondary" style="flex: 1;">Cancel</button>
+        <button id="btn-start-competition" class="btn btn-primary" style="flex: 2;">Begin Official Run 🚀</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Screen 6: Level Select Screen -->
+  <section id="level-select-screen" class="screen">
+    <div class="level-select-top">
+      <div>
+        <h2 class="screen-title">Mission Directory</h2>
+        <p class="screen-subtitle">Select a puzzle challenge to deploy Boti</p>
+      </div>
+      <div style="display: flex; gap: 0.75rem;">
+        <button id="btn-level-select-back" class="btn btn-secondary">← Main Menu</button>
+      </div>
+    </div>
+
+    <!-- Worlds container populated via JS -->
+    <div id="worlds-container"></div>
+  </section>
+
+  <!-- Screen 7: Main Game Screen -->
+  <section id="game-screen" class="screen">
+    <!-- Top Status Bar -->
+    <header class="game-top-bar">
+      <div class="game-top-left">
+        <button id="btn-game-exit" class="btn btn-secondary btn-icon" title="Exit to Level Select">↩</button>
+        <div class="game-level-info">
+          <span id="game-world-badge" class="game-world-badge">World 1</span>
+          <span id="game-level-title" class="game-level-title">Level 1: Hello, Boti!</span>
+          <span id="game-variant-badge" class="game-variant-badge" title="A newly generated maze layout">🎲 Random Layout</span>
+        </div>
+      </div>
+
+      <div class="game-stats">
+        <div class="stat-item stat-stars" title="Stars Collected in Current Run">
+          <span class="stat-icon">⭐</span>
+          <span id="game-stars-count">0 / 0</span>
+        </div>
+        <div class="stat-item stat-score" title="Player Total Score">
+          <span class="stat-icon">💎</span>
+          <span id="game-score-count">0</span>
+        </div>
+        <div id="game-timer-container" class="stat-item stat-timer" style="display: none;">
+          <span class="stat-icon">⏱️</span>
+          <span id="game-timer-display">3:00</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Gameplay Area (Grid Left, Code/Tools Right) -->
+    <div class="game-main-area">
+      <!-- Left Panel: Puzzle Grid -->
+      <div class="glass-panel game-grid-container">
+        <div id="game-grid" class="grid-board">
+          <!-- Dynamically generated tiles -->
+        </div>
+      </div>
+
+      <!-- Right Panel: Palette, Program, Controls -->
+      <div class="game-right-panel">
+        <!-- Action Palette -->
+        <div class="glass-panel palette-container">
+          <div class="palette-title">
+            <span>Action Palette</span>
+            <span style="font-size: 0.7rem; color: var(--text-muted); font-weight: normal;">Click to insert</span>
+          </div>
+          <div id="action-palette" class="action-palette">
+            <!-- Palette buttons injected dynamically -->
+          </div>
+        </div>
+
+        <!-- Program Instruction List -->
+        <div class="glass-panel program-container">
+          <div class="program-header">
+            <span class="program-title">Instruction Sequence</span>
+            <span id="instruction-count" class="instruction-limit">0 / 15</span>
+          </div>
+          <div id="instruction-list" class="instruction-list">
+            <div class="instruction-empty">
+              <span>No instructions queued yet</span>
+              <span>Select action cards above to program Boti</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Control Buttons -->
+        <div class="controls-container">
+          <button id="btn-run-code" class="btn btn-primary" title="Execute current instructions">▶ Run</button>
+          <button id="btn-reset-level" class="btn btn-secondary" title="Reset robot position">↺ Reset</button>
+          <button id="btn-undo-code" class="btn btn-secondary" title="Undo last action">↶ Undo</button>
+          <button id="btn-clear-code" class="btn btn-danger" title="Clear all instructions">🗑 Clear</button>
+          <button id="btn-hint" class="btn btn-purple" title="Get a tactical hint">💡 Hint</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bottom Panel: Java Code Preview + Explanation Tab -->
+    <div class="game-bottom-panel">
+      <!-- Code Preview -->
+      <div class="glass-panel code-preview-card">
+        <div class="panel-title">
+          <span>☕ Generated Java Code</span>
+          <span style="margin-left: auto; font-size: 0.7rem; color: var(--accent-cyan);">Live Transpiler</span>
+        </div>
+        <div id="code-editor-box" class="code-editor-box">
+          <pre><code id="java-code-output">// Instructions will transpile to Java here</code></pre>
+        </div>
+      </div>
+
+      <!-- Explanation Panel -->
+      <div class="glass-panel lesson-card">
+        <div class="panel-title">
+          <span>📚 Java Concept Academy</span>
+        </div>
+        <div id="lesson-content" class="lesson-content">
+          <div id="lesson-concept" class="lesson-concept">Sequential Execution</div>
+          <p id="lesson-explanation">Java programs execute statements from top to bottom in order.</p>
+          <div id="lesson-analogy" class="lesson-analogy">Like following a cooking recipe step by step!</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Screen 8: Results Screen -->
+  <section id="results-screen" class="screen">
+    <div class="glass-panel results-card">
+      <div class="results-boti-badge">
+        <span class="results-boti-icon">🤖</span>
+      </div>
+
+      <h2 id="results-title" class="results-banner">Mission Complete!</h2>
+      <div id="results-stars" class="stars-earned">⭐⭐⭐</div>
+
+      <div class="score-breakdown">
+        <div class="breakdown-row">
+          <span>Level Completion</span>
+          <span id="score-base">+100</span>
+        </div>
+        <div class="breakdown-row">
+          <span>Stars Collected</span>
+          <span id="score-stars">+50</span>
+        </div>
+        <div class="breakdown-row">
+          <span>Optimization Bonus</span>
+          <span id="score-efficiency">+50</span>
+        </div>
+        <div class="breakdown-row">
+          <span>No-Hint Bonus</span>
+          <span id="score-hint">+20</span>
+        </div>
+        <div class="breakdown-row" id="row-speed-bonus" style="display: none;">
+          <span>Rapid Solver Bonus</span>
+          <span id="score-speed">+35</span>
+        </div>
+        <div class="breakdown-row total-row">
+          <span>Total Score Earned</span>
+          <span id="score-total">+220</span>
+        </div>
+      </div>
+
+      <div class="results-actions">
+        <button id="btn-results-select" class="btn btn-secondary">Directory</button>
+        <button id="btn-results-retry" class="btn btn-secondary">Replay ↺</button>
+        <button id="btn-results-next" class="btn btn-primary results-btn-next">Next Level →</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Screen 9: Leaderboard Screen -->
+  <section id="leaderboard-screen" class="screen">
+    <div class="screen-header">
+      <h2 class="screen-title">Global Cadet Leaderboard</h2>
+      <p class="screen-subtitle">Top BSIT Expo Programmers & Speedrunners</p>
+    </div>
+
+    <div class="leaderboard-filters">
+      <button class="filter-tab active" data-filter="overall">Overall Score</button>
+      <button class="filter-tab" data-filter="fastest">Fastest Clear</button>
+      <button class="filter-tab" data-filter="stars">Most Stars</button>
+      <button class="filter-tab" data-filter="efficient">Most Efficient</button>
+    </div>
+
+    <div class="glass-panel" style="padding: 1rem; overflow-x: auto;">
+      <table class="leaderboard-table">
+        <thead>
+          <tr>
+            <th>Rank</th>
+            <th>Cadet Callsign</th>
+            <th>Total Score</th>
+            <th>Levels Done</th>
+            <th>Stars</th>
+            <th>Duration</th>
+          </tr>
+        </thead>
+        <tbody id="leaderboard-rows">
+          <!-- Leaderboard items rendered dynamically -->
+        </tbody>
+      </table>
+    </div>
+
+    <div style="display: flex; justify-content: center; margin-top: 1.5rem; gap: 1rem;">
+      <button id="btn-leaderboard-back" class="btn btn-secondary">← Back to Menu</button>
+    </div>
+  </section>
+
+  <!-- Screen 10: Rewards Screen (Achievements) -->
+  <section id="rewards-screen" class="screen">
+    <div class="screen-header">
+      <h2 class="screen-title">Cadet Achievements</h2>
+      <p class="screen-subtitle">Badges unlocked during your Java programming voyage</p>
+    </div>
+
+    <!-- Trophy Summary Card -->
+    <div class="glass-panel rewards-summary-card">
+      <div class="summary-stat-box">
+        <span class="summary-stat-label">Unlocked Badges</span>
+        <span id="rewards-unlocked-count" class="summary-stat-val">0 / 8</span>
+        <div class="summary-progress-bar">
+          <div id="rewards-progress-fill" class="progress-fill" style="width: 0%;"></div>
+        </div>
+      </div>
+      <div class="summary-stat-box">
+        <span class="summary-stat-label">Total Stars</span>
+        <span id="rewards-total-stars" class="summary-stat-val" style="color: var(--accent-yellow);">⭐ 0 / 36</span>
+      </div>
+      <div class="summary-stat-box">
+        <span class="summary-stat-label">Total Cadet Score</span>
+        <span id="rewards-total-score" class="summary-stat-val" style="color: var(--accent-cyan);">💎 0</span>
+      </div>
+    </div>
+
+    <div id="achievements-container" class="achievements-grid">
+      <!-- Achievements rendered dynamically -->
+    </div>
+
+    <div style="display: flex; justify-content: center; margin-top: 1.5rem; gap: 1rem;">
+      <button id="btn-rewards-back" class="btn btn-secondary">← Back to Menu</button>
+      <button id="btn-rewards-reset" class="btn btn-danger btn-sm" title="Reset local cadet achievements and scores">🗑 Reset Progress</button>
+    </div>
+  </section>
+
+  <!-- Modal: Nested Action Builder (Repeat & If-Path-Clear) -->
+  <div id="builder-modal" class="modal-overlay">
+    <div class="builder-modal">
+      <div class="modal-header">
+        <h3 id="builder-modal-title" class="modal-title">Configure Loop</h3>
+        <button id="btn-builder-close" class="modal-close">&times;</button>
+      </div>
+
+      <!-- Count Picker (for REPEAT) -->
+      <div id="builder-count-group" class="input-group">
+        <label>Repetition Count</label>
+        <div class="counter-picker">
+          <button id="btn-counter-minus" class="counter-btn">−</button>
+          <span id="counter-val" class="counter-value">3</span>
+          <button id="btn-counter-plus" class="counter-btn">+</button>
+        </div>
+      </div>
+
+      <!-- Condition Info (for IF) -->
+      <div id="builder-condition-group" class="input-group" style="display: none;">
+        <label>Condition</label>
+        <div style="font-family: 'Fira Code', monospace; color: var(--accent-green); font-size: 0.9rem; padding: 0.5rem; background: rgba(0,0,0,0.3); border-radius: 6px;">
+          if (isPathClear()) { ... }
+        </div>
+      </div>
+
+      <!-- Nested Actions palette -->
+      <div class="input-group">
+        <label>Sub-actions inside block:</label>
+        <div class="builder-palette">
+          <button class="action-card btn-builder-subaction" data-subaction="MOVE">Move ➔</button>
+          <button class="action-card btn-builder-subaction" data-subaction="TURN_LEFT">Turn ↶</button>
+          <button class="action-card btn-builder-subaction" data-subaction="TURN_RIGHT">Turn ↷</button>
+        </div>
+      </div>
+
+      <!-- Nested list display -->
+      <div id="builder-nested-list" class="nested-actions-builder">
+        <!-- Rendered list of sub-actions -->
+      </div>
+
+      <div style="display: flex; gap: 0.75rem;">
+        <button id="btn-builder-cancel" class="btn btn-secondary" style="flex: 1;">Cancel</button>
+        <button id="btn-builder-confirm" class="btn btn-primary" style="flex: 2;">Add Block to Program</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Container -->
+  <div id="toast-container" class="toast-container"></div>
+
+  <!-- Confetti Container -->
+  <div id="confetti-container" class="confetti-container"></div>
+
+  <!-- Scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>
