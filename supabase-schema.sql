@@ -90,7 +90,7 @@ DROP POLICY IF EXISTS "Admins can delete scores" ON leaderboard;
 DROP POLICY IF EXISTS "Anyone can view config" ON competition_config;
 DROP POLICY IF EXISTS "Admins can update config" ON competition_config;
 
--- Policy 1: Anyone (including anonymous school expo visitors) can submit their game run
+-- Policy 1: Anyone (including anonymous players) can submit their game run
 CREATE POLICY "Anyone can submit scores" ON leaderboard
   FOR INSERT TO anon, authenticated
   WITH CHECK (true);

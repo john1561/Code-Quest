@@ -2,16 +2,16 @@
 
 <div align="center">
 
-[![Built with Love for BSIT Expo](https://img.shields.io/badge/Built%20with%20%E2%9D%A4%EF%B8%8F-for%20BSIT%20Expo-ff4757.svg?style=for-the-badge)](#)
+[![Interactive Java Learning Game](https://img.shields.io/badge/Interactive-Java%20Learning-8b5cf6.svg?style=for-the-badge)](#)
 [![Tech Stack](https://img.shields.io/badge/Stack-HTML5%20%7C%20CSS3%20%7C%20Vanilla%20JS-00d4ff.svg?style=for-the-badge)](#)
 [![Database](https://img.shields.io/badge/Database-Supabase%20PostgreSQL-34d399.svg?style=for-the-badge)](#)
 [![License: MIT](https://img.shields.io/badge/License-MIT-8b5cf6.svg?style=for-the-badge)](LICENSE)
 
 **"Solve the puzzle. Learn Java. Claim your glory!"**
 
-*An interactive, visual puzzle game designed for school expos that makes learning Java programming concepts intuitive, engaging, and fun!*
+*An interactive visual puzzle game that makes learning Java programming concepts intuitive, engaging, and fun!*
 
-[Features](#-features) • [Quick Start](#-quick-start-local-development) • [Supabase Setup](#-supabase-setup-for-persistent-leaderboard) • [Expo Guide](#-expo-setup-guide) • [Curriculum](#-java-concepts-taught) • [Solutions](#-level-solutions-spoilers)
+[Features](#-features) • [Quick Start](#-quick-start-local-development) • [Supabase Setup](#-supabase-setup-for-persistent-leaderboard) • [Event Guide](#-event-setup-guide) • [Curriculum](#-java-concepts-taught) • [Solutions](#-level-solutions-spoilers)
 
 ---
 
@@ -19,12 +19,12 @@
 
 ## 📖 1. Title & Description
 
-**Code Quest: Java Adventure** is a lightweight, zero-install browser puzzle game built specifically for the **BSIT School Expo**. 
+**Code Quest: Java Adventure** is a lightweight, zero-install browser puzzle game built to make Java programming concepts approachable through hands-on play. 
 
 Players guide **Boti the Robot** across grid-based maze puzzles by arranging visual action cards (like `MOVE`, `TURN_RIGHT`, and `REPEAT`). As players assemble their solutions, the game dynamically translates their visual logic into real, syntactically correct Java code in real-time with beginner-friendly explanations.
 
 ### 🎯 Target Audience
-- **BSIT Expo Visitors & High School Students:** Introduces foundational logic with zero intimidation.
+- **Students & New Programmers:** Introduces foundational logic with zero intimidation.
 - **First-Time Programmers:** Visual blocks eliminate syntax anxiety and typing hurdles.
 - **IT Students & Enthusiasts:** Compete on speed, algorithmic efficiency, and maximum star collection!
 
@@ -32,7 +32,7 @@ Players guide **Boti the Robot** across grid-based maze puzzles by arranging vis
 
 ## 📂 File Structure
 
-The project is intentionally structured with pure vanilla web standards (no bundlers, frameworks, or transpilers required), making it simple for BSIT students to maintain, inspect, and host:
+The project is intentionally structured with pure vanilla web standards (no bundlers, frameworks, or transpilers required), making it simple for students and educators to maintain, inspect, and host:
 
 ```text
 codequest/
@@ -61,7 +61,7 @@ codequest/
 - 🏅 **Achievement System (8 Badges):** Unlockable badges with fanfare animations (e.g., *First Mission*, *Loop Master*, *Speedster*).
 - 🛡️ **Organizer Admin Dashboard:** Verify scores, inspect step-by-step player moves, flag suspicious runs, export CSV, and control tournament status.
 - 🔊 **Web Audio Synthesizer:** Built-in retro sound effects (movement blips, star chimes, victory fanfares) with instant mute toggle.
-- 💻 **Expo-Ready Responsive Layout:** Tailored to display crisp visuals on standard 1366×768 laptops and 1080p external monitors.
+- 💻 **Responsive Layout:** Tailored to display crisp visuals on standard 1366×768 laptops and 1080p external monitors.
 
 ---
 
@@ -86,11 +86,11 @@ The game requires **zero build steps** and runs out of the box in **Local Demo M
 
 ## 🗄️ 4. Supabase Setup (For Persistent Leaderboard)
 
-To enable a shared, cross-device online leaderboard for your school expo, connect a free [Supabase](https://supabase.com) project:
+To enable a shared, cross-device online leaderboard for your classroom or coding event, connect a free [Supabase](https://supabase.com) project:
 
 1. **Create an Account & Project:**
    - Sign up or log in at [supabase.com](https://supabase.com).
-   - Click **New Project**, choose an organization, name your project (e.g., `code-quest-expo`), and set a secure database password.
+   - Click **New Project**, choose an organization, name your project (e.g., `code-quest`), and set a secure database password.
 2. **Execute Database Schema:**
    - Navigate to the **SQL Editor** tab (terminal icon) in the left sidebar.
    - Click **New Query**.
@@ -99,7 +99,7 @@ To enable a shared, cross-device online leaderboard for your school expo, connec
 3. **Configure Authentication:**
    - In Supabase, go to **Authentication** → **Providers** → ensure **Email** is enabled.
    - Under **Authentication** → **Users**, click **Add User** / **Create User**.
-   - Enter an email and password for your expo organizers (e.g., `organizer@expo.edu`). This user will be your tournament administrator.
+   - Enter an email and password for your event organizers (e.g., `admin@example.com`). This user will be your tournament administrator.
 4. **Obtain API Keys:**
    - In the left sidebar, click **Project Settings** (gear icon) → **API**.
    - Copy the **Project URL** (e.g., `https://xyzproject.supabase.co`).
@@ -193,13 +193,13 @@ $$\text{Total Score} = \text{Completion Base} + \text{Stars} + \text{Efficiency 
 
 ## ⏱️ 9. Competition Mode
 
-Designed specifically for expo booths, tournament brackets, and live contests:
+Designed for classrooms, tournament brackets, and live contests:
 
 - **Official Timed Run:** Each player inputs their unique Nickname (1–15 characters) and receives one official attempt.
 - **Configurable Countdown:** 3 minutes default time limit (configurable to 2, 3, or 5 minutes in settings).
 - **Automated Submission:** Scores and level stats are automatically saved to the Supabase database as soon as the timer reaches zero or Level 12 is cleared.
 - **Integrity Guarantee:** Practice mode scores are flagged and never pollute official tournament rankings.
-- **Live Leaderboard:** Players can immediately see their rank, total stars, and efficiency badge on the Expo Leaderboard screen.
+- **Live Leaderboard:** Players can immediately see their rank, total stars, and efficiency badge on the Global Leaderboard screen.
 
 ---
 
@@ -221,24 +221,24 @@ Organizers have full control over tournament proceedings through a dedicated das
 
 ---
 
-## 🎪 11. Expo Setup Guide (Day of Event)
+## 🎪 11. Event Setup Guide
 
-Follow this game-day checklist to ensure a seamless booth experience:
+Follow this checklist to set up a classroom session or live competition:
 
-1. **Pre-Expo (1–2 Days Before):**
+1. **Before the Event (1–2 Days Ahead):**
    - Configure Supabase and paste credentials into [`supabase.js`](file:///c:/personalvs/codequest/supabase.js).
    - Test admin login at `admin.html`.
    - Run through 1–2 test games to confirm data records properly in the online leaderboard.
-2. **Morning of the Expo:**
+2. **Event Day:**
    - Open `admin.html` on the organizer laptop/tablet.
    - Go to **Danger Zone** → Reset Leaderboard to purge pre-event test data.
    - Go to **Competition Settings** → Configure tournament name, time limit (e.g., 3 minutes), and prize pool.
    - Click **Start Competition**.
-3. **Booth Kiosk Setup:**
+3. **Shared Device Setup:**
    - Launch `index.html` on the public player laptop(s).
    - Press `F11` in Chrome or Edge to enter clean **Full-Screen Kiosk Mode**.
    - Ensure audio is unmuted at an appropriate volume for visitors.
-4. **During the Expo:**
+4. **During the Event:**
    - Keep `admin.html` open on the organizer machine to monitor incoming scores.
    - Encourage players to check their standing on the public leaderboard.
 5. **Tournament Wrap-Up:**
@@ -386,7 +386,7 @@ Use these verified solutions to test and calibrate every level:
 
 ## 🎖️ 16. Credits
 
-- **Event:** Created for the **BSIT School Expo**
+- **Event:** Created as an interactive Java learning game
 - **Core Technologies:** HTML5, CSS3, Vanilla JavaScript (ES6+), Web Audio API
 - **Backend Infrastructure:** [Supabase](https://supabase.com) (PostgreSQL Database & Auth)
 - **Typography:** [Inter](https://fonts.google.com/specimen/Inter) by Rasmus Andersson (Google Fonts)
@@ -396,4 +396,4 @@ Use these verified solutions to test and calibrate every level:
 
 ## 📄 17. License
 
-This project is licensed under the **MIT License** — you are free to modify, expand, and utilize it for your own school exhibits, programming workshops, and hackathons!
+This project is licensed under the **MIT License** — you are free to modify, expand, and utilize it for classrooms, programming workshops, and hackathons!

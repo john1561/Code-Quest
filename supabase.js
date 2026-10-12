@@ -1,7 +1,7 @@
 /**
  * Code Quest: Java Adventure - Supabase & Data Access Layer
  * Handles online persistent storage with Supabase as well as robust offline
- * fallback (LocalStorage) for Expo demo environments.
+ * fallback (LocalStorage) for offline demo environments.
  */
 
 // ==============================================================================
@@ -26,7 +26,7 @@ const DEFAULT_COMPETITION_CONFIG = {
   prize_count: 3,
   prizes: [
     { place: 1, description: 'Champion Prize - Gold Medal & Tech Swag' },
-    { place: 2, description: 'Runner-up Prize - Silver Medal & BSIT Merch' },
+    { place: 2, description: 'Runner-up Prize - Silver Medal & Code Quest Swag' },
     { place: 3, description: 'Third Place Prize - Bronze Medal' }
   ],
   participation_reward_enabled: true,

@@ -1,6 +1,6 @@
 /* ==========================================================================
    Code Quest: Java Adventure - Core Game Logic & Engine
-   Developed for BSIT School Expo
+   Interactive Java learning game
    ========================================================================== */
 
 // ==========================================================================
@@ -739,9 +739,22 @@ function renderGrid(level) {
 function updateGridTileSizing(level = getCurrentLevel()) {
   const gridEl = document.getElementById('game-grid');
   if (!gridEl || !level) return;
+  const rows = level.gridSize.rows;
   const cols = level.gridSize.cols;
-  const availableWidth = window.innerWidth - 72 - (cols - 1) * 4;
-  const tileSize = Math.max(18, Math.min(58, Math.floor(availableWidth / cols)));
+  const container = gridEl.parentElement;
+  const containerStyles = container ? window.getComputedStyle(container) : null;
+  const gridStyles = window.getComputedStyle(gridEl);
+  const containerWidth = container && container.clientWidth
+    ? container.clientWidth - parseFloat(containerStyles.paddingLeft) - parseFloat(containerStyles.paddingRight)
+    : window.innerWidth - 40;
+  const boardPadding = (parseFloat(gridStyles.paddingLeft) || 8) * 2 + 2;
+  const gridGap = parseFloat(gridStyles.columnGap) || 4;
+  const availableWidth = containerWidth - boardPadding - (cols - 1) * gridGap;
+  const containerHeight = window.innerWidth > 1200 && container && container.clientHeight
+    ? container.clientHeight - parseFloat(containerStyles.paddingTop) - parseFloat(containerStyles.paddingBottom)
+    : Infinity;
+  const availableHeight = containerHeight - boardPadding - (rows - 1) * gridGap;
+  const tileSize = Math.max(14, Math.min(58, Math.floor(Math.min(availableWidth / cols, availableHeight / rows))));
   gridEl.style.setProperty('--grid-tile-size', `${tileSize}px`);
   gridEl.style.gridTemplateColumns = `repeat(${cols}, var(--grid-tile-size))`;
   gridEl.style.gridTemplateRows = `repeat(${level.gridSize.rows}, var(--grid-tile-size))`;
@@ -1571,6 +1584,21 @@ async function renderLeaderboard(filter = 'overall') {
 // ==========================================================================
 // LEVEL LOADING & LEVEL SELECT
 // ==========================================================================
+const ROUTE_PROFILES = {
+  1: { rows: 5, cols: 7, steps: 3, minTurns: 0, maxTurns: 0, straightOnly: true },
+  2: { rows: 5, cols: 8, steps: 4, minTurns: 0, maxTurns: 0, straightOnly: true },
+  3: { rows: 7, cols: 7, steps: 4, minTurns: 1, maxTurns: 2 },
+  4: { rows: 8, cols: 8, steps: 8, minTurns: 2, maxTurns: 3 },
+  5: { rows: 8, cols: 8, steps: 8, minTurns: 3, maxTurns: 5 },
+  6: { rows: 4, cols: 11, steps: 7, minTurns: 0, maxTurns: 0, straightOnly: true },
+  7: { rows: 9, cols: 9, steps: 10, minTurns: 3, maxTurns: 5 },
+  8: { rows: 10, cols: 10, steps: 14, minTurns: 4, maxTurns: 7 },
+  9: { rows: 8, cols: 8, steps: 8, minTurns: 2, maxTurns: 4, branches: 3 },
+  10: { rows: 10, cols: 10, steps: 12, minTurns: 4, maxTurns: 6, branches: 4 },
+  11: { rows: 7, cols: 7, steps: 5, minTurns: 1, maxTurns: 2 },
+  12: { rows: 9, cols: 9, steps: 8, minTurns: 2, maxTurns: 5, minStraight: 3 }
+};
+
 function shuffle(items) {
   for (let i = items.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
@@ -1586,7 +1614,23 @@ function getStepDirection(from, to) {
   return 'right';
 }
 
-function generatePuzzlePath(rows, cols, targetSteps, maxTurns, straightOnly, requireTurn) {
+function getPathDirections(path) {
+  return path.slice(1).map((point, index) => getStepDirection(path[index], point));
+}
+
+function pathHasLongEnoughStraight(path, minLength = 0) {
+  if (!minLength) return true;
+  let longest = 1;
+  let current = 1;
+  const directions = getPathDirections(path);
+  for (let index = 1; index < directions.length; index++) {
+    current = directions[index] === directions[index - 1] ? current + 1 : 1;
+    longest = Math.max(longest, current);
+  }
+  return longest >= minLength;
+}
+
+function generatePuzzlePath(profile, rows, cols) {
   const starts = [];
   for (let row = 1; row < rows - 1; row++) {
     for (let col = 1; col < cols - 1; col++) starts.push({ row, col });
@@ -1597,13 +1641,18 @@ function generatePuzzlePath(rows, cols, targetSteps, maxTurns, straightOnly, req
     let explored = 0;
 
     function search(turns) {
-      if (path.length === targetSteps + 1) {
-        return (!requireTurn || turns > 0) ? [...path] : null;
+      if (path.length === profile.steps + 1) {
+        if (turns < profile.minTurns || turns > profile.maxTurns) return null;
+        return pathHasLongEnoughStraight(path, profile.minStraight)
+          ? path.map(point => ({ ...point }))
+          : null;
       }
-      if (++explored > 5000) return null;
+      if (++explored > 3000) return null;
 
       const current = path[path.length - 1];
-      const previousDirection = path.length > 1 ? getStepDirection(path[path.length - 2], current) : null;
+      const previousDirection = path.length > 1
+        ? getStepDirection(path[path.length - 2], current)
+        : null;
       const candidates = shuffle([
         { row: current.row - 1, col: current.col },
         { row: current.row + 1, col: current.col },
@@ -1612,32 +1661,32 @@ function generatePuzzlePath(rows, cols, targetSteps, maxTurns, straightOnly, req
       ]).filter(next => {
         if (next.row <= 0 || next.row >= rows - 1 || next.col <= 0 || next.col >= cols - 1) return false;
         if (path.some(point => point.row === next.row && point.col === next.col)) return false;
-        // Keep the carved corridor from touching itself and creating shortcuts.
         if (path.slice(0, -1).some(point => Math.abs(point.row - next.row) + Math.abs(point.col - next.col) === 1)) return false;
-        if (straightOnly && previousDirection && getStepDirection(current, next) !== previousDirection) return false;
-        const nextTurns = turns + (previousDirection && getStepDirection(current, next) !== previousDirection ? 1 : 0);
-        return nextTurns <= maxTurns;
+        const nextDirection = getStepDirection(current, next);
+        if (profile.straightOnly && previousDirection && nextDirection !== previousDirection) return false;
+        const nextTurns = turns + (previousDirection && nextDirection !== previousDirection ? 1 : 0);
+        return nextTurns <= profile.maxTurns;
       });
 
       for (const next of candidates) {
-        const nextTurns = turns + (previousDirection && getStepDirection(current, next) !== previousDirection ? 1 : 0);
+        const nextDirection = getStepDirection(current, next);
+        const nextTurns = turns + (previousDirection && nextDirection !== previousDirection ? 1 : 0);
         path.push(next);
-        const found = search(nextTurns);
-        if (found) return found;
+        const result = search(nextTurns);
+        if (result) return result;
         path.pop();
       }
       return null;
     }
 
-    const found = search(0);
-    if (found) return found;
+    const result = search(0);
+    if (result) return result;
   }
   return null;
 }
 
 function buildPathInstructions(path, startDir, useLoops) {
-  const directions = [];
-  for (let i = 1; i < path.length; i++) directions.push(getStepDirection(path[i - 1], path[i]));
+  const directions = getPathDirections(path);
   const turnOrder = ['up', 'right', 'down', 'left'];
   const instructions = [];
   let facing = startDir;
@@ -1655,56 +1704,68 @@ function buildPathInstructions(path, startDir, useLoops) {
     let runLength = 1;
     while (directions[cursor + runLength] === nextDirection) runLength++;
     if (useLoops && runLength >= 2) {
-      while (runLength > 0) {
-        const count = Math.min(9, runLength);
-        if (count >= 2) instructions.push({ action: 'REPEAT', count, subActions: [{ action: 'MOVE' }] });
-        else instructions.push({ action: 'MOVE' });
-        runLength -= count;
-      }
+      instructions.push({ action: 'REPEAT', count: runLength, subActions: [{ action: 'MOVE' }] });
     } else {
-      for (let i = 0; i < runLength; i++) instructions.push({ action: 'MOVE' });
+      for (let step = 0; step < runLength; step++) instructions.push({ action: 'MOVE' });
     }
-    const nextSegment = directions.findIndex((direction, index) => index > cursor && direction !== nextDirection);
-    cursor = nextSegment === -1 ? directions.length : nextSegment;
+    cursor += runLength;
   }
   return instructions;
 }
 
-function createLevelVariant(baseLevel, previousLevel = null) {
-  let rows = Math.max(6, baseLevel.gridSize.rows);
-  let cols = Math.max(6, baseLevel.gridSize.cols);
-  if (rows < 8 && Math.random() < 0.45) rows++;
-  if (cols < 8 && Math.random() < 0.45) cols++;
-
-  const hasLoops = baseLevel.availableActions.includes('REPEAT');
-  const straightOnly = baseLevel.id <= 2;
-  const needsDebugTurn = baseLevel.id === 11 || baseLevel.id === 12;
-  const maxTurns = hasLoops
-    ? Math.floor((baseLevel.maxInstructions - 1) / 2)
-    : Math.max(0, baseLevel.maxInstructions - Math.ceil(baseLevel.maxInstructions * 0.6));
-  const maxSteps = Math.min(
-    Math.ceil(baseLevel.maxInstructions * 0.6),
-    (rows - 2) * (cols - 2) - 1
-  );
-  const minSteps = Math.max(2, baseLevel.stars.length + 1, needsDebugTurn ? 4 : 0);
-  let targetSteps = Math.max(minSteps, Math.min(2 + Math.floor(baseLevel.id * 0.7), maxSteps));
-  let path = null;
-
-  while (!path && targetSteps >= minSteps) {
-    path = generatePuzzlePath(rows, cols, targetSteps, maxTurns, straightOnly, needsDebugTurn);
-    if (!path) targetSteps--;
-  }
-  if (!path) {
-    rows = Math.max(rows, minSteps + 2, 7);
-    cols = Math.max(cols, minSteps + 2, 7);
-    path = [{ row: 1, col: 1 }];
-    if (needsDebugTurn) path.push({ row: 1, col: 2 });
-    const remainingSteps = minSteps - (needsDebugTurn ? 1 : 0);
-    const direction = needsDebugTurn ? { row: 1, col: 0 } : { row: 0, col: 1 };
-    for (let step = 0; step < remainingSteps; step++) {
-      const previous = path[path.length - 1];
-      path.push({ row: previous.row + direction.row, col: previous.col + direction.col });
+function addRouteBranches(grid, path, branchCount) {
+  for (let branch = 0; branch < branchCount; branch++) {
+    const candidates = [];
+    for (let row = 1; row < grid.length - 1; row++) {
+      for (let col = 1; col < grid[row].length - 1; col++) {
+        if (grid[row][col] !== 1) continue;
+        const openNeighbors = [
+          grid[row - 1][col], grid[row + 1][col], grid[row][col - 1], grid[row][col + 1]
+        ].filter(tile => tile !== 1);
+        if (openNeighbors.length === 1) candidates.push({ row, col });
+      }
     }
+    if (!candidates.length) break;
+    const spur = candidates[Math.floor(Math.random() * candidates.length)];
+    grid[spur.row][spur.col] = 0;
+  }
+}
+
+function getRouteHint(levelId) {
+  if (levelId <= 2) return 'Follow the straight corridor and collect every star before reaching the exit.';
+  if (levelId <= 5) return 'Trace the winding route and use turn commands when the passage bends.';
+  if (levelId === 6) return 'Use a REPEAT block for the long straight corridor.';
+  if (levelId <= 8) return 'Use REPEAT blocks for long straight sections, then turn at each bend.';
+  if (levelId === 9) return 'Inspect the branches and use IF PATH CLEAR to move safely through the maze.';
+  if (levelId === 10) return 'Combine REPEAT and IF PATH CLEAR to handle the branching maze.';
+  if (levelId === 11) return 'Find the incorrect turn in the preloaded program and change its direction.';
+  return 'Fix the repeat count and incorrect turn in the preloaded program.';
+}
+
+function createLevelVariant(baseLevel, previousLevel = null) {
+  const profile = ROUTE_PROFILES[baseLevel.id];
+  let path = null;
+  let rows = profile.rows;
+  let cols = profile.cols;
+  let routeKey = '';
+
+  for (let boardExpansion = 0; boardExpansion < 4; boardExpansion++) {
+    rows = profile.rows + boardExpansion * 2;
+    cols = profile.cols + boardExpansion * 2;
+    path = generatePuzzlePath(profile, rows, cols);
+    if (!path) continue;
+    routeKey = path.map(point => `${point.row},${point.col}`).join('|');
+    if (!previousLevel || previousLevel.id !== baseLevel.id || routeKey !== previousLevel.routeKey) break;
+    path = null;
+  }
+
+  // Profiles are sized to make a path possible. Retain the authored board as
+  // a safety net if a constrained random search ever fails on a future edit.
+  if (!path) {
+    return {
+      ...baseLevel,
+      routeKey: `authored-${baseLevel.id}`
+    };
   }
 
   const startPos = path[0];
@@ -1713,73 +1774,39 @@ function createLevelVariant(baseLevel, previousLevel = null) {
   const grid = Array.from({ length: rows }, () => Array(cols).fill(1));
   path.forEach(point => { grid[point.row][point.col] = 0; });
 
-  // Add random dead-end branches to the conditional maze missions.
-  if (baseLevel.id === 9 || baseLevel.id === 10) {
-    const branchCount = 2 + Math.floor(Math.random() * 3);
-    for (let branch = 0; branch < branchCount; branch++) {
-      const candidates = [];
-      for (let row = 1; row < rows - 1; row++) {
-        for (let col = 1; col < cols - 1; col++) {
-          if (grid[row][col] !== 1) continue;
-          const openNeighbors = [
-            grid[row - 1][col], grid[row + 1][col], grid[row][col - 1], grid[row][col + 1]
-          ].filter(tile => tile !== 1);
-          if (openNeighbors.length === 1) candidates.push({ row, col });
-        }
-      }
-      if (!candidates.length) break;
-      const spur = candidates[Math.floor(Math.random() * candidates.length)];
-      grid[spur.row][spur.col] = 0;
-    }
-  }
-
-  const starPositions = shuffle(path.slice(1, -1)).slice(0, baseLevel.stars.length);
-  starPositions.forEach(point => { grid[point.row][point.col] = 2; });
+  if (profile.branches) addRouteBranches(grid, path, profile.branches);
+  const stars = shuffle(path.slice(1, -1)).slice(0, baseLevel.stars.length);
+  stars.forEach(point => { grid[point.row][point.col] = 2; });
   grid[exitPos.row][exitPos.col] = 4;
 
+  const solution = buildPathInstructions(path, startDir, baseLevel.availableActions.includes('REPEAT'));
   let prefilledInstructions = null;
-  if (needsDebugTurn) {
-    prefilledInstructions = buildPathInstructions(path, startDir, hasLoops);
-    const turnIndexes = prefilledInstructions
-      .map((inst, index) => ['TURN_LEFT', 'TURN_RIGHT'].includes(inst.action) ? index : -1)
-      .filter(index => index >= 0);
-    if (turnIndexes.length) {
-      const bugIndex = turnIndexes[Math.floor(Math.random() * turnIndexes.length)];
-      prefilledInstructions[bugIndex].action = prefilledInstructions[bugIndex].action === 'TURN_LEFT' ? 'TURN_RIGHT' : 'TURN_LEFT';
+  if (baseLevel.id === 11 || baseLevel.id === 12) {
+    prefilledInstructions = JSON.parse(JSON.stringify(solution));
+    if (baseLevel.id === 12) {
+      const repeat = prefilledInstructions.find(instruction => instruction.action === 'REPEAT');
+      if (repeat) repeat.count = Math.max(1, repeat.count - 1);
     }
+    const turn = prefilledInstructions.find(instruction =>
+      instruction.action === 'TURN_LEFT' || instruction.action === 'TURN_RIGHT'
+    );
+    if (turn) turn.action = turn.action === 'TURN_LEFT' ? 'TURN_RIGHT' : 'TURN_LEFT';
   }
 
-  const solution = buildPathInstructions(path, startDir, hasLoops);
-  const variant = {
+  return {
     ...baseLevel,
     gridSize: { rows, cols },
     grid,
     startPos,
     startDir,
     exitPos,
-    stars: starPositions,
+    stars,
     optimalInstructions: solution.length,
     prefilledInstructions,
-    description: needsDebugTurn
-      ? `The ${baseLevel.id === 12 ? 'final' : 'debug'} mission has one wrong turn in the preloaded program. Find and correct it.`
-      : baseLevel.description,
-    hints: [needsDebugTurn
-      ? 'One turn in the provided program is wrong. Change it to follow the open corridor.'
-      : baseLevel.availableActions.includes('IF_PATH_CLEAR')
-        ? 'Study the branches and use IF PATH CLEAR to move only when the corridor ahead is open.'
-      : hasLoops
-        ? 'Follow the corridor, gather every star, and use repeat blocks for long straight sections.'
-        : 'Follow the open corridor, gather every star, and guide Boti to the exit.']
+    hints: [getRouteHint(baseLevel.id)],
+    routeKey
   };
-
-  const sameAsPrevious = previousLevel && previousLevel.id === baseLevel.id &&
-    previousLevel.gridSize.rows === rows && previousLevel.gridSize.cols === cols &&
-    JSON.stringify(previousLevel.grid) === JSON.stringify(grid) &&
-    previousLevel.startPos.row === startPos.row && previousLevel.startPos.col === startPos.col;
-  if (sameAsPrevious) return createLevelVariant(baseLevel, previousLevel);
-  return variant;
 }
-
 function loadLevel(index) {
   if (index < 0 || index >= LEVELS.length) return;
   const previousLevel = GameState.activeLevel;
@@ -1793,8 +1820,9 @@ function loadLevel(index) {
   // Setup top bar
   document.getElementById('game-world-badge').textContent = `World ${level.world}: ${level.worldName}`;
   document.getElementById('game-level-title').textContent = `Level ${level.id}: ${level.name}`;
-  document.getElementById('game-variant-badge').textContent = `🎲 Layout ${GameState.layoutCount}`;
+  document.getElementById('game-variant-badge').textContent = `🎲 Route ${GameState.layoutCount}`;
 
+  showScreen('game-screen');
   renderGrid(level);
   renderActionPalette(level);
 
@@ -1807,8 +1835,6 @@ function loadLevel(index) {
   updateJavaCodePreview();
   updateExplanationPanel(level);
   Robot.updateStatsDisplay();
-
-  showScreen('game-screen');
 }
 
 function renderLevelSelectScreen() {

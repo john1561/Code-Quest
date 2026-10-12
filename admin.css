@@ -936,3 +936,26 @@ input:checked + .slider:before {
 @keyframes spin {
   to { transform: rotate(360deg); }
 }
+
+@media (max-width: 680px) {
+  .admin-header {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 0.9rem;
+    padding: 1rem;
+  }
+
+  .header-brand {
+    min-width: 0;
+  }
+
+  .brand-titles h1 {
+    font-size: 1.1rem;
+  }
+
+  .header-actions {
+    width: 100%;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+}

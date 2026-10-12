@@ -369,10 +369,28 @@ body {
   font-size: 1.05rem;
 }
 
-.expo-credits {
+.home-footer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 0.75rem;
   font-size: 0.85rem;
   color: var(--text-muted);
   margin-top: 1rem;
+}
+
+.home-admin-link {
+  color: var(--text-secondary);
+  text-decoration: none;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.45);
+  transition: color 0.2s ease, border-color 0.2s ease;
+}
+
+.home-admin-link:hover,
+.home-admin-link:focus-visible {
+  color: var(--accent-cyan);
+  border-color: var(--accent-cyan);
 }
 
 /* ==========================================================================
@@ -1782,17 +1800,24 @@ body {
   }
 
   .game-main-area {
+    width: 100%;
+    min-width: 0;
     flex: none;
     min-height: 0;
     overflow: visible;
   }
 
   .game-grid-container {
+    width: 100%;
+    max-width: 100%;
     min-width: 0;
-    overflow: auto;
+    overflow-x: auto;
+    overflow-y: hidden;
+    overscroll-behavior-x: contain;
   }
 
   .game-right-panel {
+    width: 100%;
     min-width: 0;
     overflow: visible;
   }
@@ -1814,6 +1839,9 @@ body {
   }
 
   .screen {
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
     min-height: 100svh;
     padding: 1rem 0.75rem;
   }
@@ -1834,6 +1862,8 @@ body {
 
   #game-screen,
   #game-screen.active {
+    width: 100%;
+    max-width: 100%;
     padding: 0.5rem;
     gap: 0.5rem;
   }
@@ -1877,20 +1907,36 @@ body {
   }
 
   .game-main-area {
+    width: 100%;
+    min-width: 0;
+    grid-template-columns: minmax(0, 1fr);
     gap: 0.5rem;
   }
 
   .game-grid-container {
+    min-width: 0;
     padding: 0.45rem;
   }
 
   .grid-board {
+    flex: none;
     gap: 3px;
     padding: 6px;
   }
 
   .game-right-panel {
+    width: 100%;
+    min-width: 0;
     gap: 0.5rem;
+  }
+
+  .palette-container,
+  .program-container,
+  .game-bottom-panel,
+  .code-preview-card,
+  .lesson-card {
+    width: 100%;
+    min-width: 0;
   }
 
   .palette-container,
@@ -1919,6 +1965,7 @@ body {
   }
 
   .game-bottom-panel {
+    grid-template-columns: minmax(0, 1fr);
     gap: 0.5rem;
   }
 
@@ -1978,6 +2025,18 @@ body {
   .results-actions .btn {
     padding-inline: 0.45rem;
     font-size: 0.75rem;
+  }
+
+  .toast-container {
+    left: 0.75rem;
+    right: 0.75rem;
+    bottom: 0.75rem;
+  }
+
+  .builder-modal {
+    width: min(100%, calc(100vw - 1rem));
+    max-height: 90svh;
+    overflow-y: auto;
   }
 }
 

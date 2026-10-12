@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Code Quest — Admin Panel</title>
-  <meta name="description" content="Organizer Dashboard for Code Quest: Java Adventure - School Expo Tournament Management">
+  <meta name="description" content="Admin dashboard for Code Quest: Java Adventure">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
@@ -22,6 +22,7 @@
       </div>
     </div>
     <div class="header-actions">
+      <a href="index.html" class="btn btn-secondary btn-sm">Back to Game</a>
       <div id="env-badge" class="demo-indicator">
         <span class="dot"></span>
         <span id="env-text">Demo Mode (Local)</span>
@@ -46,7 +47,7 @@
         <form id="login-form">
           <div class="form-group">
             <label for="login-email">Email Address</label>
-            <input type="email" id="login-email" class="form-control" placeholder="admin@expo.edu" required autocomplete="email">
+            <input type="email" id="login-email" class="form-control" placeholder="admin@example.com" required autocomplete="email">
           </div>
 
           <div class="form-group">
@@ -168,7 +169,7 @@
               <div class="toggle-switch-container">
                 <div>
                   <strong>Active Tournament Mode</strong>
-                  <div style="font-size: 0.8rem; color: var(--text-secondary);">Enables live competitive leaderboard rules for school expo attendees.</div>
+                  <div style="font-size: 0.8rem; color: var(--text-secondary);">Enables live competition rules and leaderboard submissions.</div>
                 </div>
                 <label class="switch">
                   <input type="checkbox" id="cfg-is-active">
